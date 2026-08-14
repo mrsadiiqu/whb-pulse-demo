@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Watermelon Hub — Sales System</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+  body { font-family: 'Inter', ui-sans-serif, system-ui; }
+  .font-brand { font-family: 'Poppins', sans-serif; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState } = React;
+
+/* ---------------------------------- BRAND TOKENS ---------------------------------- */
+const C = {
+  coral: "#F4645A",
+  coralDark: "#D94A41",
+  ink: "#1A1A1A",
+  grey: "#6B6B6B",
+  line: "#EAEAEA",
+  paper: "#FAFAFA",
+  white: "#FFFFFF",
+};
+
+const Icon = ({ name, size = 14, style = {} }) => <i className={`fa-solid ${name}`} style={{ fontSize: size, ...style }}></i>;
+
+const Logo = ({ size = 34 }) => (
+  <svg width={size} height={size} viewBox="0 0 40 40">
+    <path d="M4 21 A16 16 0 0 1 36 21 Z" fill="#2E7D4F" />
+    <path d="M6 21 A14 14 0 0 1 34 21 Z" fill={C.coral} />
+    <ellipse cx="15" cy="15.5" rx="1.2" ry="1.9" fill="#1A1A1A" transform="rotate(-25 15 15.5)" />
+    <ellipse cx="20" cy="13" rx="1.2" ry="1.9" fill="#1A1A1A" />
+    <ellipse cx="25" cy="15.5" rx="1.2" ry="1.9" fill="#1A1A1A" transform="rotate(25 25 15.5)" />
+  </svg>
+);
+
+const Wordmark = ({ size = 20 }) => (
+  <div className="font-brand flex items-center gap-2">
+    <Logo size={size + 8} />
+    <div style={{ fontSize: size, lineHeight: 1 }}>
+      <span style={{ color: C.coral, fontWeight: 700 }}>Watermelon</span>{" "}
+      <span style={{ color: C.ink, fontWeight: 700 }}>Hub</span>
+    </div>
+  </div>
+);
+
+/* ---------------------------------- MOCK DATA ---------------------------------- */
+const CAMPAIGNS = [
+  { id: "radical-storage", name: "Radical Storage", client: "Radical Storage Ltd.", region: "UK & Ireland", type: "Luggage-storage partner sign-ups",
+    stages: ["New Lead", "Contacted", "Site Visited", "Agreement Sent", "Signed"] },
+  { id: "dojo", name: "Dojo", client: "Dojo Payments", region: "United Kingdom", type: "Card-machine installs",
+    stages: ["New Lead", "Demo Booked", "Site Survey", "Contract Sent", "Installed"] },
+  { id: "luggage-hero", name: "Luggage Hero", client: "Luggage Hero Inc.", region: "US & Europe", type: "Luggage-storage partner sign-ups",
+    stages: ["New Lead", "Contacted", "Qualified", "Agreement Sent", "Signed"] },
+];
+
+const AGENTS = [
+  { id: 1, name: "Emma Clarke", initials: "EC", campaigns: ["radical-storage", "dojo"], status: "On Call", calls: 11, submissions: 3, quality: 95 },
+  { id: 2, name: "Priya Nathan", initials: "PN", campaigns: ["dojo", "luggage-hero"], status: "Prospecting", calls: 8, submissions: 2, quality: 90 },
+  { id: 3, name: "Marcus Bell", initials: "MB", campaigns: ["luggage-hero", "radical-storage"], status: "Idle", calls: 4, submissions: 1, quality: 81 },
+  { id: 4, name: "Daniel Weiss", initials: "DW", campaigns: ["dojo"], status: "On Call", calls: 9, submissions: 2, quality: 88 },
+];
+
+const LEADS = [
+  { id: 1, name: "Central Convenience Store", type: "Convenience Store", territory: "London, UK", campaign: "radical-storage", stage: "Signed", agent: "Emma Clarke", last: "2d ago", score: 94 },
+  { id: 2, name: "Northside Hostel", type: "Hostel", territory: "Manchester, UK", campaign: "luggage-hero", stage: "Agreement Sent", agent: "Priya Nathan", last: "5h ago", score: 88 },
+  { id: 3, name: "Grand Central News & Gifts", type: "Newsstand", territory: "New York, US", campaign: "luggage-hero", stage: "Contacted", agent: "Marcus Bell", last: "1d ago", score: 61 },
+  { id: 4, name: "Riverside Café", type: "Café", territory: "Manchester, UK", campaign: "dojo", stage: "Demo Booked", agent: "Priya Nathan", last: "3h ago", score: 75 },
+  { id: 5, name: "Kreuzberg Bike Shop", type: "Retail", territory: "Berlin, Germany", campaign: "dojo", stage: "New Lead", agent: "Daniel Weiss", last: "—", score: 42 },
+  { id: 6, name: "Union Square Deli", type: "Deli", territory: "New York, US", campaign: "radical-storage", stage: "Site Visited", agent: "Marcus Bell", last: "6h ago", score: 80 },
+  { id: 7, name: "Camden Lock Storage Point", type: "Retail", territory: "London, UK", campaign: "radical-storage", stage: "New Lead", agent: "Unassigned", last: "—", score: 55 },
+];
+
+const CALLS = [
+  { id: "AC-58231", agent: "Emma Clarke", lead: "Central Convenience Store", date: "Aug 11", duration: "6:42", linkedSubmission: "WH-2041", result: "Pass",
+    checks: [["Introduced Watermelon Hub & campaign purpose", true], ["Explained partnership terms clearly", true], ["Confirmed next step / signature process", true], ["Logged correct contact details", true]] },
+  { id: "AC-58244", agent: "Priya Nathan", lead: "Riverside Café", date: "Aug 12", duration: "4:15", linkedSubmission: "WH-2039", result: "Review",
+    checks: [["Introduced Watermelon Hub & campaign purpose", true], ["Explained partnership terms clearly", true], ["Confirmed next step / signature process", false], ["Logged correct contact details", false]] },
+  { id: "AC-58259", agent: "Marcus Bell", lead: "Union Square Deli", date: "Aug 12", duration: "2:58", linkedSubmission: "WH-2036", result: "Fail",
+    checks: [["Introduced Watermelon Hub & campaign purpose", true], ["Explained partnership terms clearly", false], ["Confirmed next step / signature process", false], ["Logged correct contact details", false]] },
+];
+
+const SUBMISSION_STAGES = ["Submitted", "QA Verified", "Admin Approved", "Client Confirmed", "Onboarded"];
+const SUBMISSIONS = [
+  { id: "WH-2041", lead: "Central Convenience Store", agent: "Emma Clarke", campaign: "radical-storage", stage: 4, updated: "2d ago" },
+  { id: "WH-2044", lead: "Northside Hostel", agent: "Priya Nathan", campaign: "luggage-hero", stage: 2, updated: "5h ago" },
+  { id: "WH-2039", lead: "Riverside Café", agent: "Priya Nathan", campaign: "dojo", stage: 1, updated: "3h ago" },
+  { id: "WH-2036", lead: "Union Square Deli", agent: "Marcus Bell", campaign: "radical-storage", stage: 3, updated: "6h ago" },
+];
+
+const QUEUE = [
+  { time: "09:00", name: "Central Convenience Store", territory: "London, UK", campaign: "radical-storage", status: "done" },
+  { time: "10:15", name: "Camden Lock Storage Point", territory: "London, UK", campaign: "radical-storage", status: "done" },
+  { time: "11:30", name: "Riverside Café", territory: "Manchester, UK", campaign: "dojo", status: "current" },
+  { time: "13:00", name: "Grand Central News & Gifts", territory: "New York, US", campaign: "luggage-hero", status: "upcoming" },
+];
+
+const campaignById = (id) => CAMPAIGNS.find((c) => c.id === id);
+
+/* ---------------------------------- PRIMITIVES ---------------------------------- */
+const Card = ({ children, className = "" }) => (
+  <div className={`bg-white rounded-xl border border-[#EAEAEA] ${className}`}>{children}</div>
+);
+const SectionLabel = ({ children }) => <div className="text-[11px] font-semibold tracking-[0.1em] uppercase" style={{ color: C.grey }}>{children}</div>;
+
+const Pill = ({ children, tone = "neutral" }) => {
+  const tones = {
+    neutral: "bg-[#F2F2F2] text-[#555]",
+    pass: "bg-[#EFEFEF] text-[#1A1A1A]",
+    fail: "bg-[#FCEBEA] text-[#D94A41]",
+    review: "bg-[#F2F2F2] text-[#6B6B6B]",
+  };
+  return <span className={`px-2.5 py-1 rounded-full text-[11px] font-semibold whitespace-nowrap ${tones[tone]}`}>{children}</span>;
+};
+
+const StageChip = ({ stage, stages }) => {
+  const idx = stages.indexOf(stage);
+  const tone = idx <= 0 ? "neutral" : idx === stages.length - 1 ? "pass" : "review";
+  return <Pill tone={tone}>{stage}</Pill>;
+};
+
+const CampaignTag = ({ id }) => {
+  const camp = campaignById(id);
+  if (!camp) return null;
+  return (
+    <span className="inline-flex items-center gap-1.5 text-[11px] font-medium px-2 py-1 rounded-full bg-[#F2F2F2] text-[#444]">
+      <span className="w-1.5 h-1.5 rounded-full" style={{ background: C.coral }} /> {camp.name}
+    </span>
+  );
+};
+
+const Avatar = ({ initials, size = 34, filled = false }) => (
+  <div className="rounded-full flex items-center justify-center font-semibold shrink-0"
+    style={{ width: size, height: size, background: filled ? C.ink : "#EFEFEF", color: filled ? "white" : C.ink, fontSize: size * 0.36 }}>{initials}</div>
+);
+
+const StatCard = ({ icon, label, value, sub }) => (
+  <Card className="p-4">
+    <div className="flex items-center gap-2 mb-2">
+      <Icon name={icon} size={13} style={{ color: C.grey }} />
+      <div className="text-[11px] text-[#8B8B8B]">{label}</div>
+    </div>
+    <div className="text-[22px] font-semibold leading-tight" style={{ color: C.ink }}>{value}</div>
+    {sub && <div className="text-[11px] mt-0.5 text-[#8B8B8B]">{sub}</div>}
+  </Card>
+);
+
+const PageHeader = ({ eyebrow, title, action }) => (
+  <div className="flex items-end justify-between mb-6">
+    <div>
+      <SectionLabel>{eyebrow}</SectionLabel>
+      <h1 className="text-[24px] font-semibold mt-1" style={{ color: C.ink }}>{title}</h1>
+    </div>
+    {action}
+  </div>
+);
+
+const Btn = ({ children, icon, primary, onClick }) => (
+  <button onClick={onClick} className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-[13px] font-semibold"
+    style={primary ? { background: C.coral, color: "white" } : { background: "white", color: C.ink, border: "1px solid #EAEAEA" }}>
+    {icon && <Icon name={icon} size={12} />} {children}
+  </button>
+);
+
+const CampaignSelect = ({ value, onChange }) => (
+  <div className="flex items-center gap-2 bg-[#F2F2F2] rounded-lg px-3 py-2">
+    <select value={value} onChange={(e) => onChange(e.target.value)} className="bg-transparent text-[13px] font-medium outline-none" style={{ color: C.ink }}>
+      <option value="all">All campaigns</option>
+      {CAMPAIGNS.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+    </select>
+  </div>
+);
+
+/* ---------------------------------- NAV ---------------------------------- */
+const AGENT_NAV = [
+  { id: "a-dash", label: "Dashboard", icon: "fa-house" },
+  { id: "a-leadgen", label: "Lead Generation", icon: "fa-map-location-dot" },
+  { id: "a-pipeline", label: "My Pipeline", icon: "fa-code-branch" },
+  { id: "a-calls", label: "Calls & Deals", icon: "fa-phone" },
+  { id: "a-queue", label: "Call Queue", icon: "fa-list-check" },
+  { id: "a-submissions", label: "My Submissions", icon: "fa-file-lines" },
+];
+const ADMIN_NAV = [
+  { id: "d-overview", label: "Overview", icon: "fa-chart-simple" },
+  { id: "d-campaigns", label: "Campaigns", icon: "fa-briefcase" },
+  { id: "d-agents", label: "Agents & Assignment", icon: "fa-users" },
+  { id: "d-pipeline", label: "Team Pipeline", icon: "fa-code-branch" },
+  { id: "d-qa", label: "Call QA Center", icon: "fa-shield" },
+  { id: "d-submissions", label: "Submissions", icon: "fa-box-open" },
+];
+
+/* ---------------------------------- LOGIN ---------------------------------- */
+function Login({ onLogin }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  return (
+    <div className="w-full min-h-screen flex items-center justify-center" style={{ background: C.paper }}>
+      <div className="w-[380px] bg-white border border-[#EAEAEA] rounded-2xl p-9">
+        <div className="flex flex-col items-center mb-8">
+          <Logo size={44} />
+          <div className="font-brand mt-3 text-[19px]">
+            <span style={{ color: C.coral, fontWeight: 700 }}>Watermelon</span> <span style={{ color: C.ink, fontWeight: 700 }}>Hub</span>
+          </div>
+          <div className="text-[12px] mt-1" style={{ color: C.grey }}>Sales System</div>
+        </div>
+        <div className="mb-4">
+          <div className="text-[11px] font-medium mb-1.5" style={{ color: C.grey }}>Email address</div>
+          <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder="you@watermelon-hub.com"
+            className="w-full border border-[#DDD] rounded-lg px-3 py-2.5 text-[13px] outline-none" />
+        </div>
+        <div className="mb-6">
+          <div className="text-[11px] font-medium mb-1.5" style={{ color: C.grey }}>Password</div>
+          <input value={password} onChange={(e) => setPassword(e.target.value)} type="password" placeholder="••••••••"
+            className="w-full border border-[#DDD] rounded-lg px-3 py-2.5 text-[13px] outline-none" />
+        </div>
+        <button onClick={() => onLogin("agent")} className="w-full py-2.5 rounded-lg text-[13px] font-semibold text-white mb-3" style={{ background: C.coral }}>
+          Log in
+        </button>
+        <div className="text-[11px] text-center" style={{ color: "#B5B5B5" }}>Demo only — use the Agent / Manager switch inside to preview both views</div>
+      </div>
+    </div>
+  );
+}
+
+/* ---------------------------------- SHELL ---------------------------------- */
+function App() {
+  const [authed, setAuthed] = useState(false);
+  const [role, setRole] = useState("agent");
+  const [tab, setTab] = useState("a-dash");
+  const [campaign, setCampaign] = useState("all");
+  const nav = role === "agent" ? AGENT_NAV : ADMIN_NAV;
+
+  if (!authed) return <Login onLogin={() => setAuthed(true)} />;
+
+  const switchRole = (r) => { setRole(r); setTab(r === "agent" ? "a-dash" : "d-overview"); };
+  const currentUser = role === "agent" ? { name: "Emma Clarke", role: "Sales Agent", initials: "EC" } : { name: "Michael Turner", role: "Manager", initials: "MT" };
+
+  return (
+    <div className="w-full min-h-screen flex" style={{ background: C.paper }}>
+      <aside className="w-[230px] shrink-0 flex flex-col py-6 px-4 bg-white border-r border-[#EAEAEA]">
+        <div className="px-1 mb-8"><Wordmark size={16} /></div>
+
+        <div className="px-1 mb-4">
+          <div className="flex rounded-lg p-1 bg-[#F2F2F2]">
+            {["agent", "admin"].map((r) => (
+              <button key={r} onClick={() => switchRole(r)} className="flex-1 text-[11.5px] font-medium py-1.5 rounded-md"
+                style={role === r ? { background: "white", color: C.ink, boxShadow: "0 1px 2px rgba(0,0,0,0.06)" } : { color: "#9A9A9A" }}>
+                {r === "agent" ? "Agent" : "Manager"}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <nav className="flex-1 flex flex-col gap-0.5">
+          {nav.map((item) => {
+            const active = tab === item.id;
+            return (
+              <button key={item.id} onClick={() => setTab(item.id)}
+                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px]"
+                style={active ? { background: "#F7EDEC", color: C.coralDark, fontWeight: 600 } : { color: "#555" }}>
+                <Icon name={item.icon} size={13} />
+                {item.label}
+              </button>
+            );
+          })}
+        </nav>
+
+        <button onClick={() => setAuthed(false)} className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-[12.5px] text-[#9A9A9A] mt-3">
+          <Icon name="fa-arrow-right-from-bracket" size={12} /> Log out
+        </button>
+      </aside>
+
+      <main className="flex-1 flex flex-col min-w-0">
+        <div className="h-16 shrink-0 flex items-center justify-between px-7 border-b border-[#EAEAEA] bg-white">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 text-[#B5B5B5] bg-[#F2F2F2] px-3 py-2 rounded-lg w-[260px]">
+              <Icon name="fa-magnifying-glass" size={12} />
+              <span className="text-[13px]">Search…</span>
+            </div>
+            <CampaignSelect value={campaign} onChange={setCampaign} />
+          </div>
+          <div className="flex items-center gap-3">
+            <Avatar initials={currentUser.initials} filled />
+            <div>
+              <div className="text-[13px] font-semibold" style={{ color: C.ink }}>{currentUser.name}</div>
+              <div className="text-[11px] text-[#9A9A9A]">{currentUser.role}</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-7">
+          {role === "agent" && tab === "a-dash" && <AgentDashboard campaign={campaign} />}
+          {role === "agent" && tab === "a-leadgen" && <AgentLeadGen campaign={campaign} />}
+          {role === "agent" && tab === "a-pipeline" && <AgentPipeline campaign={campaign} />}
+          {role === "agent" && tab === "a-calls" && <AgentCalls />}
+          {role === "agent" && tab === "a-queue" && <AgentQueue />}
+          {role === "agent" && tab === "a-submissions" && <AgentSubmissions />}
+
+          {role === "admin" && tab === "d-overview" && <AdminOverview />}
+          {role === "admin" && tab === "d-campaigns" && <AdminCampaigns />}
+          {role === "admin" && tab === "d-agents" && <AdminAgents />}
+          {role === "admin" && tab === "d-pipeline" && <AdminPipeline campaign={campaign} />}
+          {role === "admin" && tab === "d-qa" && <AdminQA />}
+          {role === "admin" && tab === "d-submissions" && <AdminSubmissions />}
+        </div>
+      </main>
+    </div>
+  );
+}
+
+/* ============================== AGENT PAGES ============================== */
+function AgentDashboard({ campaign }) {
+  const myCampaigns = CAMPAIGNS.filter((c) => campaign === "all" || c.id === campaign);
+  return (
+    <div>
+      <PageHeader eyebrow="Good morning, Emma" title="Today at a glance" action={<Btn icon="fa-plus" primary>Submit a deal</Btn>} />
+      <div className="grid grid-cols-4 gap-4 mb-6">
+        <StatCard icon="fa-phone" label="Calls today" value="11 / 15" sub="via Aircall" />
+        <StatCard icon="fa-file-lines" label="Deals submitted" value="3" sub="1 awaiting QA" />
+        <StatCard icon="fa-code-branch" label="Active pipeline" value="9 leads" sub="Across 2 campaigns" />
+        <StatCard icon="fa-shield" label="Deal QA score" value="95%" sub="Above team avg" />
+      </div>
+      <div className="grid grid-cols-3 gap-5">
+        <Card className="p-5 col-span-2">
+          <SectionLabel>My campaigns</SectionLabel>
+          <div className="space-y-3 mt-4">
+            {myCampaigns.map((c) => (
+              <div key={c.id} className="flex items-center justify-between border-b border-[#F2F2F2] pb-3 last:border-0 last:pb-0">
+                <div>
+                  <div className="text-[13px] font-medium" style={{ color: C.ink }}>{c.name}</div>
+                  <div className="text-[11px] text-[#8B8B8B]">{c.type} · {c.region}</div>
+                </div>
+                <div className="text-[11px] text-[#8B8B8B]">{LEADS.filter((l) => l.campaign === c.id).length} leads</div>
+              </div>
+            ))}
+          </div>
+        </Card>
+        <Card className="p-5">
+          <SectionLabel>Next in call queue</SectionLabel>
+          <div className="mt-3 space-y-3">
+            {QUEUE.slice(2, 4).map((r) => (
+              <div key={r.name} className="flex items-center gap-3">
+                <div className="text-[11px] text-[#B5B5B5] w-10">{r.time}</div>
+                <div className="flex-1">
+                  <div className="text-[13px] font-medium" style={{ color: C.ink }}>{r.name}</div>
+                  <div className="text-[11px] text-[#8B8B8B]">{r.territory}</div>
+                </div>
+                {r.status === "current" && <Pill tone="review">Now</Pill>}
+              </div>
+            ))}
+          </div>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+function AgentLeadGen({ campaign }) {
+  const camp = campaign !== "all" ? campaignById(campaign) : null;
+  const mapQuery = camp ? camp.region : "United Kingdom";
+  const filtered = LEADS.filter((l) => campaign === "all" || l.campaign === campaign);
+  return (
+    <div>
+      <PageHeader eyebrow="Google Maps powered" title="Lead generation" action={<Btn icon="fa-plus" primary>Add to pipeline</Btn>} />
+      <div className="grid grid-cols-3 gap-5">
+        <Card className="col-span-2 p-5">
+          <SectionLabel>Search & pull prospects — {mapQuery}</SectionLabel>
+          <div className="rounded-xl overflow-hidden h-[340px] border border-[#EAEAEA] mt-3">
+            <iframe title="prospect-map" className="w-full h-full" loading="lazy" src={`https://www.google.com/maps?q=${encodeURIComponent(mapQuery)}&output=embed`} />
+          </div>
+        </Card>
+        <Card className="p-5">
+          <SectionLabel>Suggested prospects</SectionLabel>
+          <div className="mt-3 space-y-3">
+            {[{ n: "Paddington Storage Point", t: "Retail" }, { n: "Shoreditch Hostel Co.", t: "Hostel" }, { n: "Brick Lane Café", t: "Café" }].map((p) => (
+              <div key={p.n} className="flex items-center justify-between border-b border-[#F2F2F2] pb-3 last:border-0 last:pb-0">
+                <div>
+                  <div className="text-[13px] font-medium" style={{ color: C.ink }}>{p.n}</div>
+                  <div className="text-[11px] text-[#8B8B8B]">{p.t} · London, UK</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      </div>
+      <Card className="mt-5 p-5">
+        <SectionLabel>Pipeline-ready leads</SectionLabel>
+        <table className="w-full mt-3 text-[13px]">
+          <thead><tr className="text-left text-[11px] uppercase tracking-wide text-[#B5B5B5]">
+            <th className="pb-2 font-medium">Venue</th><th className="pb-2 font-medium">Location</th><th className="pb-2 font-medium">Campaign</th><th className="pb-2 font-medium">Stage</th>
+          </tr></thead>
+          <tbody>
+            {filtered.map((l) => (
+              <tr key={l.id} className="border-t border-[#F2F2F2]">
+                <td className="py-2.5 font-medium" style={{ color: C.ink }}>{l.name}</td>
+                <td className="py-2.5 text-[#555]">{l.territory}</td>
+                <td className="py-2.5"><CampaignTag id={l.campaign} /></td>
+                <td className="py-2.5"><StageChip stage={l.stage} stages={campaignById(l.campaign).stages} /></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </Card>
+    </div>
+  );
+}
+
+function AgentPipeline({ campaign }) {
+  const camps = campaign === "all" ? CAMPAIGNS : [campaignById(campaign)];
+  return (
+    <div>
+      <PageHeader eyebrow="Deal flow" title="My pipeline" />
+      {camps.map((c) => (
+        <div key={c.id} className="mb-8">
+          <div className="mb-3"><CampaignTag id={c.id} /></div>
+          <div className="grid grid-cols-5 gap-4">
+            {c.stages.map((stage) => {
+              const items = LEADS.filter((l) => l.campaign === c.id && l.stage === stage);
+              return (
+                <div key={stage}>
+                  <div className="text-[12px] font-medium mb-3" style={{ color: C.ink }}>{stage}</div>
+                  <div className="space-y-3">
+                    {items.map((l) => (
+                      <Card key={l.id} className="p-3.5">
+                        <div className="text-[13px] font-medium" style={{ color: C.ink }}>{l.name}</div>
+                        <div className="text-[11px] text-[#8B8B8B]">{l.type}</div>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function AgentCalls() {
+  return (
+    <div>
+      <PageHeader eyebrow="Verified via Aircall" title="Calls & deals" />
+      <Card className="p-4 mb-5">
+        <div className="text-[12.5px]" style={{ color: "#555" }}>Calls are placed in Aircall as usual. When you submit a deal, the matching recording is pulled automatically for QA.</div>
+      </Card>
+      <div className="space-y-3">
+        {CALLS.map((c) => (
+          <Card key={c.id} className="p-4 flex items-center gap-4">
+            <div className="w-36 shrink-0">
+              <div className="text-[13px] font-medium" style={{ color: C.ink }}>{c.lead}</div>
+              <div className="text-[11px] text-[#8B8B8B]">{c.date} · {c.duration}</div>
+            </div>
+            <div className="flex-1 flex items-center gap-4">
+              {c.checks.map(([label, met]) => (
+                <div key={label} className="flex items-center gap-1.5 text-[11px] text-[#555]">
+                  <Icon name={met ? "fa-check" : "fa-xmark"} size={11} style={{ color: met ? C.ink : C.coral }} />
+                  {label}
+                </div>
+              ))}
+            </div>
+            <Pill tone={c.result === "Pass" ? "pass" : c.result === "Fail" ? "fail" : "review"}>{c.result}</Pill>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function AgentQueue() {
+  return (
+    <div>
+      <PageHeader eyebrow="Assigned by manager" title="Today's call queue" />
+      <Card className="p-6">
+        <div className="space-y-4">
+          {QUEUE.map((r) => (
+            <div key={r.name} className="flex items-center justify-between border-b border-[#F2F2F2] pb-4 last:border-0">
+              <div className="flex items-center gap-4">
+                <div className="text-[12px] text-[#B5B5B5] w-10">{r.time}</div>
+                <div>
+                  <div className="text-[13.5px] font-medium" style={{ color: C.ink }}>{r.name}</div>
+                  <div className="text-[11.5px] text-[#8B8B8B]">{r.territory}</div>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <CampaignTag id={r.campaign} />
+                {r.status === "done" && <Pill tone="pass">Contacted</Pill>}
+                {r.status === "current" && <Pill tone="review">In progress</Pill>}
+                {r.status === "upcoming" && <Pill tone="neutral">Upcoming</Pill>}
+              </div>
+            </div>
+          ))}
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+function SubmissionRow({ o }) {
+  return (
+    <Card className="p-5">
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <div className="text-[13px] font-semibold flex items-center gap-2" style={{ color: C.ink }}>{o.id} · {o.lead} <CampaignTag id={o.campaign} /></div>
+          <div className="text-[11px] text-[#8B8B8B]">Agent: {o.agent} · Updated {o.updated}</div>
+        </div>
+        <Pill tone={o.stage === 4 ? "pass" : "review"}>{SUBMISSION_STAGES[o.stage]}</Pill>
+      </div>
+      <div className="flex items-center">
+        {SUBMISSION_STAGES.map((s, i) => (
+          <React.Fragment key={s}>
+            <div className="flex flex-col items-center gap-1.5" style={{ width: 96 }}>
+              <div className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-semibold"
+                style={{ background: i <= o.stage ? C.ink : "#F2F2F2", color: i <= o.stage ? "white" : "#B5B5B5" }}>
+                {i < o.stage ? <Icon name="fa-check" size={10} /> : i + 1}
+              </div>
+              <div className="text-[10px] text-center text-[#555]">{s}</div>
+            </div>
+            {i < SUBMISSION_STAGES.length - 1 && <div className="flex-1 h-[1.5px]" style={{ background: i < o.stage ? C.ink : "#F2F2F2" }} />}
+          </React.Fragment>
+        ))}
+      </div>
+    </Card>
+  );
+}
+
+function AgentSubmissions() {
+  return (
+    <div>
+      <PageHeader eyebrow="Submitted by me" title="My submissions" action={<Btn icon="fa-plus" primary>Submit a deal</Btn>} />
+      <div className="space-y-4">{SUBMISSIONS.filter((o) => o.agent === "Emma Clarke").map((o) => <SubmissionRow key={o.id} o={o} />)}</div>
+    </div>
+  );
+}
+
+/* ============================== ADMIN PAGES ============================== */
+function AdminOverview() {
+  return (
+    <div>
+      <PageHeader eyebrow="Team performance" title="Overview" />
+      <div className="grid grid-cols-4 gap-4 mb-6">
+        <StatCard icon="fa-users" label="Active agents" value="4" sub="3 working now" />
+        <StatCard icon="fa-briefcase" label="Live campaigns" value="3" sub="3 clients" />
+        <StatCard icon="fa-shield" label="Avg. deal QA" value="88%" sub="1 flagged this week" />
+        <StatCard icon="fa-box-open" label="Deals in progress" value="4" />
+      </div>
+      <div className="grid grid-cols-3 gap-5">
+        <Card className="p-5 col-span-2">
+          <SectionLabel>Leads by campaign</SectionLabel>
+          <div className="flex items-end gap-8 mt-5 h-36">
+            {CAMPAIGNS.map((c) => {
+              const count = LEADS.filter((l) => l.campaign === c.id).length;
+              return (
+                <div key={c.id} className="flex-1 flex flex-col items-center justify-end gap-2">
+                  <div className="text-[11px] text-[#8B8B8B]">{count}</div>
+                  <div className="w-full rounded-t" style={{ height: `${count * 26}px`, background: "#EFEFEF" }} />
+                  <div className="text-[10.5px] text-[#555] text-center">{c.name}</div>
+                </div>
+              );
+            })}
+          </div>
+        </Card>
+        <Card className="p-5">
+          <SectionLabel>Leaderboard</SectionLabel>
+          <div className="mt-3 space-y-3">
+            {AGENTS.slice().sort((a, b) => b.quality - a.quality).map((a, i) => (
+              <div key={a.id} className="flex items-center gap-3">
+                <div className="text-[11px] text-[#B5B5B5] w-3">{i + 1}</div>
+                <Avatar initials={a.initials} size={26} />
+                <div className="flex-1">
+                  <div className="text-[12.5px] font-medium" style={{ color: C.ink }}>{a.name}</div>
+                </div>
+                <div className="text-[12px] font-semibold" style={{ color: C.ink }}>{a.quality}%</div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+function AdminCampaigns() {
+  return (
+    <div>
+      <PageHeader eyebrow="Client accounts" title="Campaigns" action={<Btn icon="fa-plus" primary>New campaign</Btn>} />
+      <div className="grid grid-cols-3 gap-5">
+        {CAMPAIGNS.map((c) => {
+          const camLeads = LEADS.filter((l) => l.campaign === c.id);
+          const camAgents = AGENTS.filter((a) => a.campaigns.includes(c.id));
+          return (
+            <Card key={c.id} className="p-5">
+              <div className="text-[14px] font-semibold mb-1" style={{ color: C.ink }}>{c.name}</div>
+              <div className="text-[11px] text-[#8B8B8B] mb-3">{c.client} · {c.region}</div>
+              <div className="text-[12px] text-[#555] mb-3">{c.type}</div>
+              <div className="mb-3">
+                <div className="text-[10px] uppercase tracking-wide text-[#B5B5B5] mb-1.5">Pipeline stages</div>
+                <div className="flex flex-wrap gap-1.5">
+                  {c.stages.map((s) => <span key={s} className="text-[10.5px] px-2 py-1 rounded-full bg-[#F2F2F2] text-[#555]">{s}</span>)}
+                </div>
+              </div>
+              <div className="flex items-center justify-between text-[12px] pt-3 border-t border-[#F2F2F2]">
+                <span className="text-[#555]">{camLeads.length} leads</span>
+                <div className="flex -space-x-2">{camAgents.map((a) => <Avatar key={a.id} initials={a.initials} size={22} />)}</div>
+              </div>
+            </Card>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function AdminAgents() {
+  const [sel, setSel] = useState(AGENTS[0]);
+  const toggle = (agentId, campId) => {}; // demo only
+  return (
+    <div>
+      <PageHeader eyebrow="Assign campaigns to agents" title="Agents & assignment" />
+      <Card className="p-5">
+        <table className="w-full text-[13px]">
+          <thead>
+            <tr className="text-left text-[11px] uppercase tracking-wide text-[#B5B5B5]">
+              <th className="pb-3 font-medium">Agent</th>
+              {CAMPAIGNS.map((c) => <th key={c.id} className="pb-3 font-medium text-center">{c.name}</th>)}
+              <th className="pb-3 font-medium">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {AGENTS.map((a) => (
+              <tr key={a.id} className="border-t border-[#F2F2F2]">
+                <td className="py-3 flex items-center gap-2"><Avatar initials={a.initials} size={26} /><span className="font-medium" style={{ color: C.ink }}>{a.name}</span></td>
+                {CAMPAIGNS.map((c) => (
+                  <td key={c.id} className="text-center">
+                    <input type="checkbox" defaultChecked={a.campaigns.includes(c.id)} className="w-4 h-4 accent-[#1A1A1A]" />
+                  </td>
+                ))}
+                <td className="py-3"><Pill tone={a.status === "Idle" ? "neutral" : "pass"}>{a.status}</Pill></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <div className="flex justify-end mt-5"><Btn primary icon="fa-check">Save assignments</Btn></div>
+      </Card>
+    </div>
+  );
+}
+
+function AdminPipeline({ campaign }) {
+  const filtered = LEADS.filter((l) => campaign === "all" || l.campaign === campaign);
+  return (
+    <div>
+      <PageHeader eyebrow="Assign & reassign" title="Team pipeline" />
+      <Card className="p-5">
+        <table className="w-full text-[13px]">
+          <thead><tr className="text-left text-[11px] uppercase tracking-wide text-[#B5B5B5]">
+            <th className="pb-2 font-medium">Venue</th><th className="pb-2 font-medium">Location</th><th className="pb-2 font-medium">Campaign</th><th className="pb-2 font-medium">Stage</th><th className="pb-2 font-medium">Owner</th>
+          </tr></thead>
+          <tbody>
+            {filtered.map((l) => (
+              <tr key={l.id} className="border-t border-[#F2F2F2]">
+                <td className="py-2.5 font-medium" style={{ color: C.ink }}>{l.name}</td>
+                <td className="py-2.5 text-[#555]">{l.territory}</td>
+                <td className="py-2.5"><CampaignTag id={l.campaign} /></td>
+                <td className="py-2.5"><StageChip stage={l.stage} stages={campaignById(l.campaign).stages} /></td>
+                <td className="py-2.5 text-[#555]">{l.agent === "Unassigned" ? <span className="italic text-[#B5B5B5]">Unassigned</span> : l.agent}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </Card>
+    </div>
+  );
+}
+
+function AdminQA() {
+  return (
+    <div>
+      <PageHeader eyebrow="AI deal verification" title="Call QA center" />
+      <Card className="p-5 mb-5">
+        <SectionLabel>Active QA prompt</SectionLabel>
+        <div className="rounded-lg p-4 text-[13px] leading-relaxed mt-2 bg-[#FAFAFA] border border-[#F2F2F2]" style={{ color: C.ink }}>
+          "Pass a deal only if the agent introduces Watermelon Hub and the campaign purpose, clearly explains the partnership terms, confirms the next step, and logs accurate contact details. Mark as Review if most are met; Fail otherwise."
+        </div>
+        <div className="flex justify-end mt-3"><Btn>Edit prompt</Btn></div>
+      </Card>
+      <div className="space-y-3">
+        {CALLS.map((c) => (
+          <Card key={c.id} className="p-4">
+            <div className="flex items-center gap-4">
+              <div className="w-36 shrink-0">
+                <div className="text-[13px] font-medium" style={{ color: C.ink }}>{c.agent}</div>
+                <div className="text-[11px] text-[#8B8B8B]">{c.lead} · Deal {c.linkedSubmission}</div>
+              </div>
+              <div className="flex-1 flex items-center gap-4">
+                {c.checks.map(([label, met]) => (
+                  <div key={label} className="flex items-center gap-1.5 text-[11px] text-[#555]">
+                    <Icon name={met ? "fa-check" : "fa-xmark"} size={11} style={{ color: met ? C.ink : C.coral }} />
+                    {label}
+                  </div>
+                ))}
+              </div>
+              <Pill tone={c.result === "Pass" ? "pass" : c.result === "Fail" ? "fail" : "review"}>{c.result}</Pill>
+            </div>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function AdminSubmissions() {
+  return (
+    <div>
+      <PageHeader eyebrow="From submission to onboarding" title="Submissions" />
+      <div className="space-y-4">{SUBMISSIONS.map((o) => <SubmissionRow key={o.id} o={o} />)}</div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>
