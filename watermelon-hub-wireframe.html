@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Watermelon Hub Sales System — Wireframe</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: #ffffff; color: #111;
+    font-family: Arial, Helvetica, sans-serif;
+    padding: 40px 24px 100px;
+  }
+  h1.doc-title { text-align: center; font-size: 22px; margin: 0 0 4px; }
+  p.doc-sub { text-align: center; color: #777; font-size: 13px; margin: 0 0 50px; }
+
+  .flow-label {
+    display: inline-block; background: #111; color: #fff; font-size: 11px;
+    font-weight: bold; padding: 4px 10px; border-radius: 3px; margin-bottom: 10px;
+    letter-spacing: 0.5px;
+  }
+  .screen-title { font-size: 14px; font-weight: bold; margin: 0 0 10px; color: #111; }
+
+  .stage { max-width: 1100px; margin: 0 auto 10px; }
+  .arrow-down { display: flex; justify-content: center; margin: 6px 0 26px; }
+  .arrow-down svg { display: block; }
+  .branch-row { display: flex; justify-content: center; gap: 130px; margin: 0 0 10px; }
+  .branch-arrows { max-width: 900px; margin: 0 auto; height: 60px; }
+
+  .wire { border: 2px solid #111; background: #fff; border-radius: 4px; }
+  .wire-topbar {
+    border-bottom: 2px solid #111; background: #eee; padding: 8px 12px;
+    display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: #333;
+  }
+  .bar { background: #d9d9d9; border-radius: 2px; height: 8px; }
+  .bar.dark { background: #b8b8b8; }
+  .box-outline { border: 1.5px dashed #999; border-radius: 3px; }
+  .placeholder-x {
+    position: relative; border: 1.5px dashed #999; border-radius: 3px; background: #fafafa;
+    display: flex; align-items: center; justify-content: center; color: #aaa; font-size: 11px;
+  }
+  .field-label { font-size: 10px; color: #555; margin-bottom: 3px; }
+  .field-box { border: 1.5px solid #333; border-radius: 3px; height: 26px; background: #fff; }
+  .btn { border: 2px solid #111; border-radius: 3px; text-align: center; font-size: 11px; font-weight: bold; padding: 8px 0; background: #fff; }
+  .btn.filled { background: #111; color: #fff; }
+  .nav-item { font-size: 10.5px; padding: 6px 8px; border-radius: 3px; }
+  .nav-item.active { background: #111; color: #fff; }
+  .nav-item.inactive { color: #333; }
+  .chip { border: 1px solid #999; border-radius: 12px; font-size: 9.5px; padding: 2px 8px; color: #555; display: inline-block; }
+  .table-row { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 8px; padding: 6px 0; border-bottom: 1px solid #eee; align-items: center; }
+  .table-head { font-size: 9.5px; color: #999; font-weight: bold; text-transform: uppercase; }
+  .table-cell { font-size: 10.5px; color: #333; }
+  .note { font-size: 10.5px; color: #777; font-style: italic; margin-top: 10px; }
+  .section-divider { max-width: 1100px; margin: 60px auto 30px; border-top: 2px dashed #ccc; position: relative; }
+  .section-divider span { position: absolute; top: -11px; left: 50%; transform: translateX(-50%); background: #fff; padding: 0 14px; font-size: 12px; font-weight: bold; color: #555; letter-spacing: 1px; }
+  .checkbox { width: 13px; height: 13px; border: 1.5px solid #333; display: inline-block; vertical-align: middle; margin-right: 6px; border-radius: 2px; }
+  .checkbox.checked { background: #111; }
+</style>
+</head>
+<body>
+
+<h1 class="doc-title">Watermelon Hub Sales System</h1>
+<p class="doc-sub">Low-fidelity wireframe — screen flow &amp; layout (Login → Manager / Agent dashboards)</p>
+
+<!-- ============ SCREEN 1: LOGIN ============ -->
+<div class="stage">
+  <div class="flow-label">SCREEN 1</div>
+  <div class="screen-title">Login</div>
+  <div class="wire" style="max-width:420px; margin:0 auto; padding:36px 30px;">
+    <div style="display:flex; flex-direction:column; align-items:center; margin-bottom:26px;">
+      <div class="placeholder-x" style="width:56px; height:56px; border-radius:50%; margin-bottom:10px;">LOGO</div>
+      <div style="font-size:15px; font-weight:bold;">Watermelon Hub</div>
+      <div style="font-size:10.5px; color:#888;">Sales System</div>
+    </div>
+    <div style="margin-bottom:14px;">
+      <div class="field-label">Email address</div>
+      <div class="field-box"></div>
+    </div>
+    <div style="margin-bottom:18px;">
+      <div class="field-label">Password</div>
+      <div class="field-box"></div>
+    </div>
+    <div class="btn filled">LOG IN</div>
+    <div class="note" style="text-align:center;">System checks credentials, then loads the Manager or Agent dashboard depending on the account's role.</div>
+  </div>
+</div>
+
+<div class="arrow-down">
+  <svg width="24" height="46"><line x1="12" y1="0" x2="12" y2="34" stroke="#111" stroke-width="2"/><polygon points="12,46 4,32 20,32" fill="#111"/></svg>
+</div>
+
+<div class="stage" style="text-align:center; margin-bottom:0;">
+  <div class="flow-label" style="background:#777;">ROLE CHECK</div>
+  <div class="screen-title" style="text-align:center;">System detects account role</div>
+</div>
+
+<!-- branch arrows -->
+<svg class="branch-arrows" viewBox="0 0 900 60" style="display:block; margin:0 auto;">
+  <line x1="450" y1="0" x2="450" y2="15" stroke="#111" stroke-width="2"/>
+  <line x1="450" y1="15" x2="220" y2="15" stroke="#111" stroke-width="2"/>
+  <line x1="450" y1="15" x2="680" y2="15" stroke="#111" stroke-width="2"/>
+  <line x1="220" y1="15" x2="220" y2="46" stroke="#111" stroke-width="2"/>
+  <line x1="680" y1="15" x2="680" y2="46" stroke="#111" stroke-width="2"/>
+  <polygon points="220,58 212,44 228,44" fill="#111"/>
+  <polygon points="680,58 672,44 688,44" fill="#111"/>
+  <text x="220" y="34" font-size="11" text-anchor="middle" fill="#555" font-weight="bold">MANAGER</text>
+  <text x="680" y="34" font-size="11" text-anchor="middle" fill="#555" font-weight="bold">AGENT</text>
+</svg>
+
+<div class="section-divider"><span>MANAGER FLOW</span></div>
+
+<!-- ============ SCREEN 2: MANAGER DASHBOARD ============ -->
+<div class="stage" style="max-width:1000px;">
+  <div class="flow-label">SCREEN 2</div>
+  <div class="screen-title">Manager Dashboard</div>
+  <div class="wire" style="display:flex; min-height:360px;">
+    <!-- sidebar -->
+    <div style="width:170px; border-right:2px solid #111; padding:14px 10px; display:flex; flex-direction:column; gap:5px;">
+      <div class="placeholder-x" style="height:30px; margin-bottom:10px;">LOGO</div>
+      <div class="nav-item active">Overview</div>
+      <div class="nav-item inactive">Campaigns</div>
+      <div class="nav-item inactive">Agents &amp; Assignment</div>
+      <div class="nav-item inactive">Team Pipeline</div>
+      <div class="nav-item inactive">Call QA Center</div>
+      <div class="nav-item inactive">Submissions</div>
+      <div class="nav-item inactive">Settings</div>
+    </div>
+    <!-- content -->
+    <div style="flex:1; padding:16px 20px;">
+      <div class="bar" style="width:140px; margin-bottom:16px;"></div>
+      <div style="display:flex; gap:12px; margin-bottom:18px;">
+        <div class="box-outline" style="flex:1; height:56px; padding:8px;"><div class="bar" style="width:60%; margin-bottom:6px;"></div><div class="bar dark" style="width:30%;"></div></div>
+        <div class="box-outline" style="flex:1; height:56px; padding:8px;"><div class="bar" style="width:60%; margin-bottom:6px;"></div><div class="bar dark" style="width:30%;"></div></div>
+        <div class="box-outline" style="flex:1; height:56px; padding:8px;"><div class="bar" style="width:60%; margin-bottom:6px;"></div><div class="bar dark" style="width:30%;"></div></div>
+        <div class="box-outline" style="flex:1; height:56px; padding:8px;"><div class="bar" style="width:60%; margin-bottom:6px;"></div><div class="bar dark" style="width:30%;"></div></div>
+      </div>
+      <div style="display:flex; gap:14px;">
+        <div class="box-outline" style="flex:1.4; height:180px; padding:10px;">
+          <div class="bar" style="width:45%; margin-bottom:10px;"></div>
+          <div style="display:flex; align-items:flex-end; gap:8px; height:110px;">
+            <div style="background:#ccc; width:20px; height:60%;"></div>
+            <div style="background:#ccc; width:20px; height:90%;"></div>
+            <div style="background:#ccc; width:20px; height:40%;"></div>
+            <div style="background:#ccc; width:20px; height:75%;"></div>
+            <div style="background:#ccc; width:20px; height:55%;"></div>
+          </div>
+        </div>
+        <div class="box-outline" style="flex:1; height:180px; padding:10px;">
+          <div class="bar" style="width:60%; margin-bottom:10px;"></div>
+          <div class="bar" style="width:90%; margin-bottom:8px;"></div>
+          <div class="bar" style="width:80%; margin-bottom:8px;"></div>
+          <div class="bar" style="width:85%; margin-bottom:8px;"></div>
+          <div class="bar" style="width:70%;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="arrow-down">
+  <svg width="24" height="46"><line x1="12" y1="0" x2="12" y2="34" stroke="#111" stroke-width="2"/><polygon points="12,46 4,32 20,32" fill="#111"/></svg>
+</div>
+
+<!-- ============ SCREEN 3: AGENTS & ASSIGNMENT ============ -->
+<div class="stage" style="max-width:1000px;">
+  <div class="flow-label">SCREEN 3</div>
+  <div class="screen-title">Agents &amp; Campaign Assignment — manager assigns agents to one or more campaigns</div>
+  <div class="wire" style="display:flex; min-height:340px;">
+    <div style="width:170px; border-right:2px solid #111; padding:14px 10px; display:flex; flex-direction:column; gap:5px;">
+      <div class="placeholder-x" style="height:30px; margin-bottom:10px;">LOGO</div>
+      <div class="nav-item inactive">Overview</div>
+      <div class="nav-item inactive">Campaigns</div>
+      <div class="nav-item active">Agents &amp; Assignment</div>
+      <div class="nav-item inactive">Team Pipeline</div>
+      <div class="nav-item inactive">Call QA Center</div>
+      <div class="nav-item inactive">Submissions</div>
+      <div class="nav-item inactive">Settings</div>
+    </div>
+    <div style="flex:1; padding:16px 20px;">
+      <div class="table-row table-head"><div>Agent</div><div>Radical Storage</div><div>Dojo</div><div>Luggage Hero</div></div>
+      <div class="table-row"><div class="table-cell">Agent A</div><div><span class="checkbox checked"></span></div><div><span class="checkbox"></span></div><div><span class="checkbox checked"></span></div></div>
+      <div class="table-row"><div class="table-cell">Agent B</div><div><span class="checkbox"></span></div><div><span class="checkbox checked"></span></div><div><span class="checkbox"></span></div></div>
+      <div class="table-row"><div class="table-cell">Agent C</div><div><span class="checkbox checked"></span></div><div><span class="checkbox checked"></span></div><div><span class="checkbox"></span></div></div>
+      <div class="table-row"><div class="table-cell">Agent D</div><div><span class="checkbox"></span></div><div><span class="checkbox"></span></div><div><span class="checkbox checked"></span></div></div>
+      <div style="margin-top:18px; display:flex; justify-content:flex-end;">
+        <div class="btn filled" style="width:140px;">SAVE ASSIGNMENTS</div>
+      </div>
+      <div class="note">Some agents work a single campaign, others work several — checked boxes control which campaigns appear on that agent's own dashboard.</div>
+    </div>
+  </div>
+</div>
+
+<!-- connector manager -> agent -->
+<svg viewBox="0 0 900 90" style="display:block; max-width:1000px; margin:10px auto;">
+  <line x1="450" y1="0" x2="450" y2="20" stroke="#111" stroke-width="2"/>
+  <line x1="450" y1="20" x2="680" y2="20" stroke="#111" stroke-width="2"/>
+  <line x1="680" y1="20" x2="680" y2="70" stroke="#111" stroke-width="2"/>
+  <polygon points="680,82 672,68 688,68" fill="#111"/>
+  <text x="565" y="14" font-size="10.5" fill="#777" font-style="italic">updates what the agent sees</text>
+</svg>
+
+<div class="section-divider"><span>AGENT FLOW</span></div>
+
+<!-- ============ SCREEN 4: AGENT DASHBOARD ============ -->
+<div class="stage" style="max-width:1000px;">
+  <div class="flow-label">SCREEN 4</div>
+  <div class="screen-title">Agent Dashboard — only shows campaigns this agent is assigned to</div>
+  <div class="wire" style="display:flex; min-height:340px;">
+    <div style="width:170px; border-right:2px solid #111; padding:14px 10px; display:flex; flex-direction:column; gap:5px;">
+      <div class="placeholder-x" style="height:30px; margin-bottom:10px;">LOGO</div>
+      <div class="nav-item active">Dashboard</div>
+      <div class="nav-item inactive">Lead Generation</div>
+      <div class="nav-item inactive">My Pipeline</div>
+      <div class="nav-item inactive">Calls &amp; Deals</div>
+      <div class="nav-item inactive">Call Queue</div>
+      <div class="nav-item inactive">My Submissions</div>
+    </div>
+    <div style="flex:1; padding:16px 20px;">
+      <div class="bar" style="width:160px; margin-bottom:10px;"></div>
+      <div style="margin-bottom:16px;"><span class="chip">Radical Storage</span> &nbsp; <span class="chip">Luggage Hero</span></div>
+      <div style="display:flex; gap:12px; margin-bottom:18px;">
+        <div class="box-outline" style="flex:1; height:56px; padding:8px;"><div class="bar" style="width:60%; margin-bottom:6px;"></div><div class="bar dark" style="width:30%;"></div></div>
+        <div class="box-outline" style="flex:1; height:56px; padding:8px;"><div class="bar" style="width:60%; margin-bottom:6px;"></div><div class="bar dark" style="width:30%;"></div></div>
+        <div class="box-outline" style="flex:1; height:56px; padding:8px;"><div class="bar" style="width:60%; margin-bottom:6px;"></div><div class="bar dark" style="width:30%;"></div></div>
+      </div>
+      <div class="box-outline" style="height:150px; padding:10px;">
+        <div class="bar" style="width:50%; margin-bottom:10px;"></div>
+        <div class="bar" style="width:95%; margin-bottom:8px;"></div>
+        <div class="bar" style="width:85%; margin-bottom:8px;"></div>
+        <div class="bar" style="width:90%; margin-bottom:8px;"></div>
+        <div class="bar" style="width:75%;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="arrow-down">
+  <svg width="24" height="46"><line x1="12" y1="0" x2="12" y2="34" stroke="#111" stroke-width="2"/><polygon points="12,46 4,32 20,32" fill="#111"/></svg>
+</div>
+
+<!-- ============ SCREEN 5: LEAD GENERATION ============ -->
+<div class="stage" style="max-width:1000px;">
+  <div class="flow-label">SCREEN 5</div>
+  <div class="screen-title">Lead Generation — map search for new prospects</div>
+  <div class="wire" style="display:flex; min-height:320px;">
+    <div style="width:170px; border-right:2px solid #111; padding:14px 10px; display:flex; flex-direction:column; gap:5px;">
+      <div class="placeholder-x" style="height:30px; margin-bottom:10px;">LOGO</div>
+      <div class="nav-item inactive">Dashboard</div>
+      <div class="nav-item active">Lead Generation</div>
+      <div class="nav-item inactive">My Pipeline</div>
+      <div class="nav-item inactive">Calls &amp; Deals</div>
+      <div class="nav-item inactive">Call Queue</div>
+      <div class="nav-item inactive">My Submissions</div>
+    </div>
+    <div style="flex:1; padding:16px 20px; display:flex; gap:14px;">
+      <div class="placeholder-x" style="flex:1.6; height:260px;">MAP SEARCH AREA</div>
+      <div style="flex:1;">
+        <div class="bar" style="width:70%; margin-bottom:10px;"></div>
+        <div class="table-row"><div class="table-cell">Prospect 1</div><div class="table-cell">★ 88</div></div>
+        <div class="table-row"><div class="table-cell">Prospect 2</div><div class="table-cell">★ 74</div></div>
+        <div class="table-row"><div class="table-cell">Prospect 3</div><div class="table-cell">★ 61</div></div>
+        <div class="btn" style="margin-top:14px;">ADD TO PIPELINE</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="arrow-down">
+  <svg width="24" height="46"><line x1="12" y1="0" x2="12" y2="34" stroke="#111" stroke-width="2"/><polygon points="12,46 4,32 20,32" fill="#111"/></svg>
+</div>
+
+<!-- ============ SCREEN 6: PIPELINE ============ -->
+<div class="stage" style="max-width:1000px;">
+  <div class="flow-label">SCREEN 6</div>
+  <div class="screen-title">My Pipeline — leads move stage by stage, per campaign</div>
+  <div class="wire" style="display:flex; min-height:300px;">
+    <div style="width:170px; border-right:2px solid #111; padding:14px 10px; display:flex; flex-direction:column; gap:5px;">
+      <div class="placeholder-x" style="height:30px; margin-bottom:10px;">LOGO</div>
+      <div class="nav-item inactive">Dashboard</div>
+      <div class="nav-item inactive">Lead Generation</div>
+      <div class="nav-item active">My Pipeline</div>
+      <div class="nav-item inactive">Calls &amp; Deals</div>
+      <div class="nav-item inactive">Call Queue</div>
+      <div class="nav-item inactive">My Submissions</div>
+    </div>
+    <div style="flex:1; padding:16px 20px;">
+      <div style="margin-bottom:12px;"><span class="chip">Radical Storage</span></div>
+      <div style="display:flex; gap:10px;">
+        <div style="flex:1;"><div class="bar" style="width:70%; margin-bottom:8px;"></div><div class="box-outline" style="height:60px; margin-bottom:6px;"></div><div class="box-outline" style="height:60px;"></div></div>
+        <div style="flex:1;"><div class="bar" style="width:70%; margin-bottom:8px;"></div><div class="box-outline" style="height:60px;"></div></div>
+        <div style="flex:1;"><div class="bar" style="width:70%; margin-bottom:8px;"></div><div class="box-outline" style="height:60px; margin-bottom:6px;"></div><div class="box-outline" style="height:60px;"></div></div>
+        <div style="flex:1;"><div class="bar" style="width:70%; margin-bottom:8px;"></div></div>
+        <div style="flex:1;"><div class="bar" style="width:70%; margin-bottom:8px;"></div><div class="box-outline" style="height:60px;"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="arrow-down">
+  <svg width="24" height="46"><line x1="12" y1="0" x2="12" y2="34" stroke="#111" stroke-width="2"/><polygon points="12,46 4,32 20,32" fill="#111"/></svg>
+</div>
+
+<!-- ============ SCREEN 7: CALLS & DEALS ============ -->
+<div class="stage" style="max-width:1000px;">
+  <div class="flow-label">SCREEN 7</div>
+  <div class="screen-title">Calls &amp; Deals — Aircall calls, auto-checked when a deal is submitted</div>
+  <div class="wire" style="display:flex; min-height:300px;">
+    <div style="width:170px; border-right:2px solid #111; padding:14px 10px; display:flex; flex-direction:column; gap:5px;">
+      <div class="placeholder-x" style="height:30px; margin-bottom:10px;">LOGO</div>
+      <div class="nav-item inactive">Dashboard</div>
+      <div class="nav-item inactive">Lead Generation</div>
+      <div class="nav-item inactive">My Pipeline</div>
+      <div class="nav-item active">Calls &amp; Deals</div>
+      <div class="nav-item inactive">Call Queue</div>
+      <div class="nav-item inactive">My Submissions</div>
+    </div>
+    <div style="flex:1; padding:16px 20px;">
+      <div class="box-outline" style="padding:8px 10px; margin-bottom:14px; font-size:10.5px; color:#666;">Calls placed via Aircall — recording pulled automatically once a deal is submitted</div>
+      <div class="table-row table-head"><div>Prospect</div><div>Duration</div><div>Checklist</div><div>Result</div></div>
+      <div class="table-row"><div class="table-cell">Prospect A</div><div class="table-cell">6:42</div><div class="table-cell">4/4</div><div class="table-cell">PASS</div></div>
+      <div class="table-row"><div class="table-cell">Prospect B</div><div class="table-cell">4:15</div><div class="table-cell">2/4</div><div class="table-cell">REVIEW</div></div>
+      <div class="table-row"><div class="table-cell">Prospect C</div><div class="table-cell">2:58</div><div class="table-cell">1/4</div><div class="table-cell">FAIL</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="arrow-down">
+  <svg width="24" height="46"><line x1="12" y1="0" x2="12" y2="34" stroke="#111" stroke-width="2"/><polygon points="12,46 4,32 20,32" fill="#111"/></svg>
+</div>
+
+<!-- ============ SCREEN 8: MY SUBMISSIONS ============ -->
+<div class="stage" style="max-width:1000px;">
+  <div class="flow-label">SCREEN 8</div>
+  <div class="screen-title">My Submissions — deal status from submission to completion</div>
+  <div class="wire" style="display:flex; min-height:260px;">
+    <div style="width:170px; border-right:2px solid #111; padding:14px 10px; display:flex; flex-direction:column; gap:5px;">
+      <div class="placeholder-x" style="height:30px; margin-bottom:10px;">LOGO</div>
+      <div class="nav-item inactive">Dashboard</div>
+      <div class="nav-item inactive">Lead Generation</div>
+      <div class="nav-item inactive">My Pipeline</div>
+      <div class="nav-item inactive">Calls &amp; Deals</div>
+      <div class="nav-item inactive">Call Queue</div>
+      <div class="nav-item active">My Submissions</div>
+    </div>
+    <div style="flex:1; padding:16px 20px;">
+      <div class="bar" style="width:55%; margin-bottom:16px;"></div>
+      <div style="display:flex; align-items:center; gap:0;">
+        <div style="text-align:center; width:110px;"><div class="checkbox checked" style="width:20px;height:20px;border-radius:50%;margin:0 auto 4px;"></div><div style="font-size:9px;">Submitted</div></div>
+        <div style="flex:1; height:2px; background:#111;"></div>
+        <div style="text-align:center; width:110px;"><div class="checkbox checked" style="width:20px;height:20px;border-radius:50%;margin:0 auto 4px;"></div><div style="font-size:9px;">QA Verified</div></div>
+        <div style="flex:1; height:2px; background:#111;"></div>
+        <div style="text-align:center; width:110px;"><div class="checkbox" style="width:20px;height:20px;border-radius:50%;margin:0 auto 4px;"></div><div style="font-size:9px;">Admin Approved</div></div>
+        <div style="flex:1; height:2px; background:#ccc;"></div>
+        <div style="text-align:center; width:110px;"><div class="checkbox" style="width:20px;height:20px;border-radius:50%;margin:0 auto 4px;"></div><div style="font-size:9px;">Client Confirmed</div></div>
+        <div style="flex:1; height:2px; background:#ccc;"></div>
+        <div style="text-align:center; width:110px;"><div class="checkbox" style="width:20px;height:20px;border-radius:50%;margin:0 auto 4px;"></div><div style="font-size:9px;">Onboarded</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
